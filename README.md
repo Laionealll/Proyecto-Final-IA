@@ -6,9 +6,9 @@
 
 ### 🌟 datos generales
 
-- **nombre del personaje**: nina 😍
-- **creador**: laioneall williams
-- **matrícula**: 23-eisn-2-035
+- **nombre del personaje**: Nina 😍
+- **creador**: Laioneall Williams
+- **matrícula**: 23-EISN-2-035
 - **proyecto final de**: inteligencia artificial 
 
 ---
@@ -77,5 +77,5 @@ esperamos que te encante tanto como a nosotros crearlo.
 
 ---
 
-> hecho con mucho amor por **laioneall williams** 
-> matrícula: `23-eisn-2-035`
+> hecho con mucho amor por **Laioneall Williams** 
+> matrícula: `23-EISN-2-035`
