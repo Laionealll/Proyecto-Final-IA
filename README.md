@@ -1,6 +1,6 @@
 # 🌸 vtuber nina ✨
 
-こんにちは☆　bienvenid@ al proyecto **vtuber nina**, una waifu digital adorable creada para conversar contigo con voz real y animaciones kawaii~ 😻
+
 
 ---
 
