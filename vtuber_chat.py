@@ -7,16 +7,19 @@ import os
 import time
 from pygame.locals import *
 from elevenlabs import generate, set_api_key
+import sounddevice as sd
+from scipy.io.wavfile import write
+import tempfile
 
 # configuración
-openai.api_key = "TU_API_KEY_OPENAI"  # open ai api
-set_api_key("TU_API_KEY_ELEVENLABS")   # api elevenlabs
-voice_id = "wBnAJRbu3cj93gnAm02O"       # id de voz eleven labs
+openai.api_key = "open ai apikey"
+set_api_key("elevenlabs apikey")
+voice_id = "wBnAJRbu3cj93gnAm02O"
 
 WIDTH, HEIGHT = 720, 720
 FPS = 60
 
-estado = "reposo"           # estados: reposo, hablando, parpadeo
+estado = "reposo"
 anim_toggle = False
 last_toggle_time = time.time()
 is_speaking = False
@@ -25,7 +28,6 @@ parpadeo_start_time = 0
 lock_estado = threading.Lock()
 
 def inicializar_mixer():
-    # inicializa el mixer si no está iniciado
     if not pygame.mixer.get_init():
         try:
             pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=4096)
@@ -37,13 +39,12 @@ def inicializar_mixer():
     return True
 
 def obtener_respuesta(mensaje):
-    # solicita respuesta a openai usando gpt-3.5-turbo
     try:
         print("obteniendo respuesta de openai...")
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[
-                {"role": "system", "content": "eres nina, una asistente anime kawaii, dulce y educada. hablas español de forma tierna, simpática y amigable. fuiste creada por laionel para su proyecto final."},
+                {"role": "system", "content": "eres nina, una asistente anime kawaii, dulce y educada. hablas español de forma tierna, simpática y amigable. fuiste creada por laionel para su proyecto final de inteligencia artificial."},
                 {"role": "user", "content": mensaje}
             ],
             temperature=0.7,
@@ -57,7 +58,6 @@ def obtener_respuesta(mensaje):
         return "lo siento, hubo un error. intenta de nuevo."
 
 def hablar_kawaii(texto):
-    # genera audio con elevenlabs en streaming, lo guarda, reproduce y elimina el archivo temporal
     global is_speaking
     is_speaking = True
     try:
@@ -97,7 +97,6 @@ def hablar_kawaii(texto):
             print(f"error al eliminar archivo temporal: {e}")
 
 def vtuber_habla(texto):
-    # cambia a estado hablando, reproduce audio y vuelve a reposo
     global estado, last_toggle_time, anim_toggle, is_speaking
     with lock_estado:
         estado = "hablando"
@@ -111,7 +110,6 @@ def vtuber_habla(texto):
     threading.Thread(target=reproducir, daemon=True).start()
 
 def iniciar_parpadeo_automatico():
-    # cambia a estado parpadeo si está en reposo
     def parpadeo():
         global estado, parpadeo_start_time, is_speaking
         while True:
@@ -122,8 +120,26 @@ def iniciar_parpadeo_automatico():
                     parpadeo_start_time = time.time()
     threading.Thread(target=parpadeo, daemon=True).start()
 
+def grabar_audio_duracion(segundos=5, samplerate=44100):
+    print("Grabando...")
+    audio = sd.rec(int(segundos * samplerate), samplerate=samplerate, channels=1, dtype='int16')
+    sd.wait()
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
+    write(temp_file.name, samplerate, audio)
+    print("Grabación terminada.")
+    return temp_file.name
+
+def transcribir_audio(file_path):
+    try:
+        print("Transcribiendo con Whisper...")
+        with open(file_path, "rb") as audio_file:
+            transcript = openai.Audio.transcribe("whisper-1", audio_file, language="es")
+        return transcript["text"]
+    except Exception as e:
+        print(f"Error al transcribir: {e}")
+        return ""
+
 def main():
-    # inicia pygame, carga imágenes, atiende eventos y muestra animación
     global estado, anim_toggle, last_toggle_time, parpadeo_start_time
     pygame.init()
     inicializar_mixer()
@@ -172,6 +188,14 @@ def main():
                         user_text = user_text[:-1]
                     else:
                         user_text += event.unicode
+                elif event.key == pygame.K_v:
+                    def escuchar_y_responder():
+                        audio_path = grabar_audio_duracion()
+                        texto_voz = transcribir_audio(audio_path)
+                        if texto_voz.strip() != "":
+                            respuesta = obtener_respuesta(texto_voz)
+                            vtuber_habla(respuesta)
+                    threading.Thread(target=escuchar_y_responder, daemon=True).start()
         screen.fill((255, 228, 250))
         with lock_estado:
             current_time = time.time()
