@@ -1,81 +1,69 @@
-# 🌸 vtuber nina ✨
+# VTuber Nina: Asistente Virtual Anime con Voz e Inteligencia Artificial
 
+**VTuber Nina** es un proyecto de asistente virtual en forma de una chica anime kawaii, programada para interactuar de manera simpática y natural con los usuarios. Utiliza inteligencia artificial avanzada para comprender preguntas por texto o voz y responder con una voz realista generada por ElevenLabs. Fue creada como parte de un proyecto final con un enfoque educativo, divertido e interactivo.
 
+## 🚀 Características principales
 
----
+- Interfaz visual animada (reposo, parpadeo y hablando)
+- Chat en tiempo real con IA (GPT-4o)
+- Reconocimiento de voz con Whisper
+- Generación de audio realista con ElevenLabs
+- Parpadeo automático mientras está en reposo
+- Activación por texto o por micrófono (tecla V)
 
-### 🌟 datos generales
+## 🎧 Tecnologías y librerías utilizadas
 
-- **nombre del personaje**: Nina 😍
-- **creador**: Laioneall Williams
-- **matrícula**: 23-EISN-2-035
-- **proyecto final de**: inteligencia artificial 
+- `pygame`: Para la interfaz visual y animaciones
+- `openai`: Para usar el modelo GPT-4o y Whisper
+- `sounddevice`: Para grabar audio desde el micrófono
+- `scipy`: Para guardar la grabación en formato WAV
+- `elevenlabs`: Para generar audio de voz natural en español
 
----
+## 🌐 Requisitos previos
 
-### 💡 ¿qué hace nina?
+Asegúrate de tener Python 3.8+ y las siguientes librerías instaladas:
 
-nina es una vtuber programada con inteligencia artificial que:
-- responde a tus mensajes en lenguaje natural 🚀
-- habla con voz kawaii generada por elevenlabs 🎤
-- tiene sprites que simulan parpadeo, hablar y reposo 😸
-- es tu amiguita digital siempre lista para conversar ❤️
-
----
-
-### 🔧 tecnologías utilizadas
-
-- `python` ⚡ lenguaje de programación principal
-- `pygame` 🛸 para animación y renderizado en tiempo real
-- `openai api` 🤖 para generar las respuestas del personaje
-- `elevenlabs api` 🎤 para convertir texto en audio adorable
-
----
-
-### 📋 estructura del proyecto
-
-- `vtuber_chat.py` 📄 archivo principal con la lógica de nina
-- `images/` 🌟 carpeta con los sprites del personaje:
-  - `1.png` — reposo
-  - `2.png` — hablando
-  - `3.png` — parpadeando
-
----
-
-### 🚪 requisitos
-
-- `python 3.11` o superior
-- librerías: `pygame`, `openai`, `elevenlabs`
-- api keys activas para:
-  - [openai](https://openai.com/)
-  - [elevenlabs](https://www.elevenlabs.io/)
-
----
-
-### 🚀 cómo ejecutarlo
-
-1. instala las dependencias:
 ```bash
-pip install pygame openai elevenlabs
+pip install pygame openai sounddevice scipy elevenlabs
 ```
-2. coloca tus api keys en `vtuber_chat.py`
-3. verifica que `images/` contenga los 3 sprites (`1.png`, `2.png`, `3.png`)
-4. ejecuta:
+
+> **Nota:** Necesitarás claves de API de OpenAI y ElevenLabs para ejecutar el proyecto.
+
+## 🎓 Configuración de APIs
+
+Edita las siguientes líneas al inicio del archivo `vtuber_chat.py` con tus claves personales:
+
+```python
+openai.api_key = "TU_CLAVE_OPENAI"
+set_api_key("TU_CLAVE_ELEVENLABS")
+voice_id = "ID_DE_VOZ_ELEVENLABS"
+```
+
+## 🏋️ Instrucciones de uso
+
+1. Asegúrate de tener una carpeta `images/` con las tres imágenes necesarias:
+    - `1.png`: rostro normal
+    - `2.png`: con boca abierta (hablando)
+    - `3.png`: parpadeando
+
+2. Ejecuta el programa:
+
 ```bash
 python vtuber_chat.py
 ```
 
-y listo! ✨ nina aparecerá en pantalla lista para conversar contigo 🥰
+3. Puedes interactuar escribiendo en la caja de texto o presionando la tecla **`V`** para hablar por micrófono.
+
+## 🧵 Autor
+
+Este proyecto fue desarrollado por **Laioneall** como parte de un trabajo final de programación e inteligencia artificial.
 
 ---
 
-### 🩵 notas finales
-
-este proyecto busca demostrar el poder de la inteligencia artificial y la interacción humana por medio de personajes digitales animados en tiempo real. nina es una vtuber con alma kawaii y corazón techie~ 😍🌺
-
-esperamos que te encante tanto como a nosotros crearlo.
+✨ **VTuber Nina** no es solo una herramienta educativa, sino una experiencia encantadora e interactiva que mezcla tecnología de punta con arte digital. ¡Ideal para proyectos de IA conversacional y entretenimiento virtual!
 
 ---
+
 
 > hecho con mucho amor por **Laioneall Williams** 
 > matrícula: `23-EISN-2-035`
