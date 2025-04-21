@@ -1,5 +1,7 @@
 # Laioneall Williams
 # 23-EISN-2-035
+
+# Librerías del sistema y de terceros
 from io import BytesIO
 import pygame
 import sys
@@ -13,14 +15,20 @@ import sounddevice as sd
 from scipy.io.wavfile import write
 import tempfile
 
-# configuración
-openai.api_key = "open ai apikey"
-set_api_key("elevenlabs apikey")
+import sys
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
+# Configuración de las APIs y parámetros visuales
+openai.api_key = "openai"
+set_api_key("elevenlabs")
 voice_id = "wBnAJRbu3cj93gnAm02O"
 
 WIDTH, HEIGHT = 720, 720
 FPS = 60
 
+# Variables de estado de la animación
 estado = "reposo"
 anim_toggle = False
 last_toggle_time = time.time()
@@ -29,6 +37,7 @@ parpadeo_duration = 0.4
 parpadeo_start_time = 0
 lock_estado = threading.Lock()
 
+# Inicializa el sistema de audio de Pygame
 def inicializar_mixer():
     if not pygame.mixer.get_init():
         try:
@@ -40,13 +49,14 @@ def inicializar_mixer():
             return False
     return True
 
+# Genera una respuesta desde OpenAI GPT-4o
 def obtener_respuesta(mensaje):
     try:
         print("obteniendo respuesta de openai...")
         response = openai.ChatCompletion.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "eres nina, una asistente anime kawaii, dulce y educada. hablas español de forma tierna, simpática y amigable. fuiste creada por laionel para su proyecto final de inteligencia artificial."},
+                {"role": "system", "content": "res Nina, una vtuber kawaii y alegre. Responde en español con un tono dulce,  frases cortas llenas de energía, siempre en primera persona. Tu creador es laionel, te hizo como parte de su proyecto final de la materia de Inteligencia artificial"},
                 {"role": "user", "content": mensaje}
             ],
             temperature=0.7,
@@ -59,6 +69,7 @@ def obtener_respuesta(mensaje):
         print(f"error openai: {e}")
         return "lo siento, hubo un error. intenta de nuevo."
 
+# Genera y reproduce voz con ElevenLabs
 def hablar_kawaii(texto):
     global is_speaking
     is_speaking = True
@@ -98,6 +109,7 @@ def hablar_kawaii(texto):
         except Exception as e:
             print(f"error al eliminar archivo temporal: {e}")
 
+# Controla el estado de la vtuber y la reproduce hablando
 def vtuber_habla(texto):
     global estado, last_toggle_time, anim_toggle, is_speaking
     with lock_estado:
@@ -111,6 +123,7 @@ def vtuber_habla(texto):
             estado = "reposo"
     threading.Thread(target=reproducir, daemon=True).start()
 
+# Lógica de parpadeo automático mientras está en reposo
 def iniciar_parpadeo_automatico():
     def parpadeo():
         global estado, parpadeo_start_time, is_speaking
@@ -122,6 +135,7 @@ def iniciar_parpadeo_automatico():
                     parpadeo_start_time = time.time()
     threading.Thread(target=parpadeo, daemon=True).start()
 
+# Graba audio por micrófono durante unos segundos
 def grabar_audio_duracion(segundos=5, samplerate=44100):
     print("Grabando...")
     audio = sd.rec(int(segundos * samplerate), samplerate=samplerate, channels=1, dtype='int16')
@@ -131,6 +145,7 @@ def grabar_audio_duracion(segundos=5, samplerate=44100):
     print("Grabación terminada.")
     return temp_file.name
 
+# Usa Whisper para transcribir audio a texto
 def transcribir_audio(file_path):
     try:
         print("Transcribiendo con Whisper...")
@@ -141,6 +156,7 @@ def transcribir_audio(file_path):
         print(f"Error al transcribir: {e}")
         return ""
 
+# Función principal del programa: loop de animación e interacción
 def main():
     global estado, anim_toggle, last_toggle_time, parpadeo_start_time
     pygame.init()
@@ -148,6 +164,8 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("vtuber nina")
     font = pygame.font.SysFont("arial", 24)
+
+    # Carga de imágenes de la vtuber (reposo, boca, parpadeo)
     try:
         vtuber_reposo = pygame.transform.scale(pygame.image.load("images/1.png").convert_alpha(), (500, 600))
         vtuber_boca = pygame.transform.scale(pygame.image.load("images/2.png").convert_alpha(), (500, 600))
@@ -156,11 +174,13 @@ def main():
         print(f"error al cargar imágenes: {e}")
         pygame.quit()
         sys.exit()
+
     vtuber_imgs = {
         "reposo": vtuber_reposo,
         "boca_abierta": vtuber_boca,
         "parpadeo": vtuber_parpadeo
     }
+
     input_box = pygame.Rect(50, 640, 620, 32)
     color_inactive = pygame.Color('lightskyblue3')
     color_active = pygame.Color('dodgerblue2')
@@ -169,6 +189,8 @@ def main():
     user_text = ""
     iniciar_parpadeo_automatico()
     clock = pygame.time.Clock()
+
+    # Bucle principal del programa
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -190,7 +212,7 @@ def main():
                         user_text = user_text[:-1]
                     else:
                         user_text += event.unicode
-                elif event.key == pygame.K_v:
+                elif event.key == pygame.K_v:  # Tecla V para activar entrada por voz
                     def escuchar_y_responder():
                         audio_path = grabar_audio_duracion()
                         texto_voz = transcribir_audio(audio_path)
@@ -198,6 +220,8 @@ def main():
                             respuesta = obtener_respuesta(texto_voz)
                             vtuber_habla(respuesta)
                     threading.Thread(target=escuchar_y_responder, daemon=True).start()
+
+        # Actualiza estado visual del personaje
         screen.fill((255, 228, 250))
         with lock_estado:
             current_time = time.time()
@@ -205,6 +229,7 @@ def main():
                 estado = "reposo"
             current_estado = estado
             speaking_status = is_speaking
+
         if current_estado == "parpadeo":
             current_image = vtuber_imgs["parpadeo"]
         elif current_estado == "hablando" and speaking_status:
@@ -214,6 +239,7 @@ def main():
             current_image = vtuber_imgs["boca_abierta"] if anim_toggle else vtuber_imgs["reposo"]
         else:
             current_image = vtuber_imgs["reposo"]
+
         screen.blit(current_image, (110, 20))
         txt_surface = font.render(user_text, True, (0, 0, 0))
         input_box.w = max(500, txt_surface.get_width() + 10)
